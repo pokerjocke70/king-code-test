@@ -40,7 +40,5 @@ public class HttpServer {
                 .map(h -> h.invoke(readBody(httpExchange), getFirstPathParameter(httpExchange.getRequestURI()), (String) httpExchange.getAttribute(AuthenticationFilter.USER_SESSION_ID)))
                 .or(() -> Optional.of(new Response(404, "Not found")))
                 .ifPresent(r -> sendResponse(httpExchange, r.body(), r.status()));
-
     }
-
 }

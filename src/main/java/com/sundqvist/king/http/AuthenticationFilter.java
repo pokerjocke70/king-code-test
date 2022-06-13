@@ -41,7 +41,7 @@ public class AuthenticationFilter extends Filter {
     }
 
     private void validateSessionKey(HttpExchange exchange, Chain chain, URI requestURI) throws IOException {
-        String sessionKey = HttpHelper.getFirstQueryParameter(requestURI);
+        String sessionKey = getFirstQueryParameter(requestURI);
         if(sessionKey != null){
             Optional<UserSession> userSession = userStore.get(sessionKey);
             if (userSession.isPresent()) {
