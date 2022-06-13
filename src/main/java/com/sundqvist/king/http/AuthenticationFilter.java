@@ -46,7 +46,7 @@ public class AuthenticationFilter extends Filter {
     }
 
     private void storeSession(HttpExchange exchange, URI requestURI) {
-        sendResponse(exchange, userStore.create(getFirstPathParameter(requestURI)).id(), 200);
+        sendResponse(exchange, userStore.create(getFirstPathParameter(requestURI)).key(), 200);
     }
 
 

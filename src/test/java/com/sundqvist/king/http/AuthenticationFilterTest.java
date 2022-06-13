@@ -34,7 +34,7 @@ public class AuthenticationFilterTest {
 
         // then
         Mockito.verifyNoInteractions(chain);
-        Mockito.verify(httpExchange, Mockito.times(1)).sendResponseHeaders(Mockito.eq(200), Mockito.eq(4L));
+        Mockito.verify(httpExchange, Mockito.times(1)).sendResponseHeaders(Mockito.eq(200), Mockito.eq(1L));
 
     }
 
