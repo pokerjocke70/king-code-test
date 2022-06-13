@@ -3,7 +3,6 @@ package com.sundqvist.king.http;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sundqvist.king.domain.UserSession;
-import com.sundqvist.king.http.util.HttpHelper;
 import com.sundqvist.king.repository.UserSessionRepository;
 
 import java.io.IOException;
@@ -32,35 +31,26 @@ public class AuthenticationFilter extends Filter {
         URI requestURI = exchange.getRequestURI();
         if (requestURI.getPath().endsWith("/login")) {
             storeSession(exchange, requestURI);
+            return;
         } else if (!nonValidatingPaths.contains(getPathParameter(requestURI, 1))) {
-            validateSessionKey(exchange, chain, requestURI);
-        } else {
-            chain.doFilter(exchange);
+            if (!validateSessionKey(exchange, requestURI)) {
+                return;
+            }
         }
-
+        chain.doFilter(exchange);
     }
 
-    private void validateSessionKey(HttpExchange exchange, Chain chain, URI requestURI) throws IOException {
-        String sessionKey = getFirstQueryParameter(requestURI);
-        if(sessionKey != null){
-            Optional<UserSession> userSession = userStore.get(sessionKey);
-            if (userSession.isPresent()) {
-                exchange.setAttribute(USER_SESSION_ID, userSession.get().id());
-                chain.doFilter(exchange);
-            } else {
-                // No valid session, abort
-                sendResponse(exchange, "Unauthorized", 401);
-            }
-        } else {
-            // No valid session, abort
-            sendResponse(exchange, "Missing sessionkey parameter", 401);
-        }
+    private boolean validateSessionKey(HttpExchange exchange, URI requestURI) {
+        Optional.ofNullable(getFirstQueryParameter(requestURI))
+                .flatMap(userStore::get)
+                .ifPresentOrElse(s -> exchange.setAttribute(USER_SESSION_ID, s.id()), () -> sendResponse(exchange, "Unauthorized", 401));
+
+        return exchange.getResponseCode() == -1;
     }
 
     private void storeSession(HttpExchange exchange, URI requestURI) {
-        String userId = getFirstPathParameter(requestURI);
         String uuid = UUID.randomUUID().toString();
-        userStore.store(uuid, new UserSession(userId, LocalDateTime.now().plusMinutes(10L)));
+        userStore.store(uuid, new UserSession(getFirstPathParameter(requestURI), LocalDateTime.now().plusMinutes(10L)));
         sendResponse(exchange, uuid, 200);
     }
 

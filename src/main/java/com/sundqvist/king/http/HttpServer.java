@@ -9,6 +9,12 @@ import java.util.Set;
 
 import static com.sundqvist.king.http.util.HttpHelper.*;
 
+/**
+ * HttpServer using com.sun.net.httpserver.HttpServer
+ *
+ * Starts a server at a user defined port.
+ *
+ */
 public class HttpServer {
 
     private static final System.Logger LOGGER = System.getLogger(HttpServer.class.getName());
@@ -25,10 +31,15 @@ public class HttpServer {
         this.port = port;
     }
 
+    /**
+     * Starts the http server on the root context
+     *
+     * @throws IOException
+     */
     public void run() throws IOException {
         var httpServer = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(port), 20);
         httpServer.createContext("/", this::handle).getFilters().add(authenticationFilter);
-        LOGGER.log(System.Logger.Level.INFO, "Starting server on port {1}, Ctrl-C to abort", port);
+        LOGGER.log(System.Logger.Level.INFO, "Starting server on port {0}, Ctrl-C to abort", String.valueOf(port));
         httpServer.start();
     }
 
