@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserSessionRepository {
@@ -31,13 +32,15 @@ public class UserSessionRepository {
         }, 30_000L, 60_000L);
     }
 
-
-    public void store(String key, UserSession value) {
-        concurrentHashMap.put(key, value);
+    public UserSession create(String user){
+        String key = UUID.randomUUID().toString();
+        UserSession userSession = new UserSession(user, LocalDateTime.now().plusMinutes(10L), key);
+        concurrentHashMap.put(key, userSession);
+        return userSession;
     }
 
     public Optional<UserSession> get(String key) {
         return Optional.ofNullable(concurrentHashMap.get(key))
-                .filter(userSession -> userSession.expiration().isAfter(LocalDateTime.now()));
+                .filter(UserSession::isValid);
     }
 }

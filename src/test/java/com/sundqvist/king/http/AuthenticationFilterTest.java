@@ -23,16 +23,18 @@ public class AuthenticationFilterTest {
         UserSessionRepository userSessionRepository = Mockito.mock(UserSessionRepository.class);
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(userSessionRepository);
         Filter.Chain chain = Mockito.mock(Filter.Chain.class);
+        UserSession userSession = new UserSession("user", LocalDateTime.now(), "k");
 
         // when
-        BDDMockito.when(userSessionRepository.get("user")).thenReturn(Optional.of(new UserSession("user", LocalDateTime.now())));
+        BDDMockito.when(userSessionRepository.get("user")).thenReturn(Optional.of(userSession));
+        BDDMockito.when(userSessionRepository.create("user")).thenReturn(userSession);
         BDDMockito.when(httpExchange.getRequestURI()).thenReturn(URI.create("/user/login"));
         BDDMockito.when(httpExchange.getResponseBody()).thenReturn(new ByteArrayOutputStream());
         authenticationFilter.doFilter(httpExchange, chain);
 
         // then
         Mockito.verifyNoInteractions(chain);
-        Mockito.verify(httpExchange, Mockito.times(1)).sendResponseHeaders(Mockito.eq(200), Mockito.eq(36L));
+        Mockito.verify(httpExchange, Mockito.times(1)).sendResponseHeaders(Mockito.eq(200), Mockito.eq(4L));
 
     }
 
@@ -45,7 +47,7 @@ public class AuthenticationFilterTest {
         Filter.Chain chain = Mockito.mock(Filter.Chain.class);
 
         // when
-        BDDMockito.when(userSessionRepository.get("123")).thenReturn(Optional.of(new UserSession("user", LocalDateTime.now())));
+        BDDMockito.when(userSessionRepository.get("123")).thenReturn(Optional.of(new UserSession("user", LocalDateTime.now(), "k")));
         BDDMockito.when(httpExchange.getRequestURI()).thenReturn(URI.create("/77/score?sessionkey=123"));
         BDDMockito.when(httpExchange.getResponseCode()).thenReturn(-1);
         authenticationFilter.doFilter(httpExchange, chain);

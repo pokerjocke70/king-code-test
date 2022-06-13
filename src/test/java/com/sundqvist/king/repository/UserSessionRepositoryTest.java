@@ -1,31 +1,26 @@
 package com.sundqvist.king.repository;
 
-import com.sundqvist.king.domain.UserSession;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import java.time.LocalDateTime;
 
 public class UserSessionRepositoryTest {
 
     @Test
-    public void storingUserWithInactivationDateInFutureShouldReturnTheSameUser() {
+    public void storingUserShouldReturnTheSameUser() {
         // given
         UserSessionRepository userSessionRepository = new UserSessionRepository();
-        UserSession user = new UserSession("user", LocalDateTime.now().plusMinutes(1L));
         // when
-        userSessionRepository.store("my-key", user);
+        String key = userSessionRepository.create("user").key();
         // then
-        Assertions.assertThat(userSessionRepository.get("my-key").orElseThrow()).isSameAs(user);
+        Assertions.assertThat(userSessionRepository.get(key).orElseThrow().id()).isEqualTo("user");
     }
 
     @Test
-    public void storingUserWithInActivationDateInPastShouldReturnNull() {
+    public void getInvalidUserShouldReturnEmpty() {
         // given
         UserSessionRepository userSessionRepository = new UserSessionRepository();
-        UserSession user = new UserSession("user", LocalDateTime.now().minusMinutes(1L));
         // when
-        userSessionRepository.store("my-key", user);
+        userSessionRepository.create("user");
         // then
         Assertions.assertThat(userSessionRepository.get("my-key")).isEmpty();
     }

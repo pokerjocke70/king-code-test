@@ -2,15 +2,12 @@ package com.sundqvist.king.http;
 
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
-import com.sundqvist.king.domain.UserSession;
 import com.sundqvist.king.repository.UserSessionRepository;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static com.sundqvist.king.http.util.HttpHelper.*;
 
@@ -20,7 +17,7 @@ public class AuthenticationFilter extends Filter {
 
     private final UserSessionRepository userStore;
 
-    private final Set<String> nonValidatingPaths = Set.of("highscorelist");
+    private final Set<String> unRestrictedPaths = Set.of("highscorelist");
 
     public AuthenticationFilter(UserSessionRepository userStore) {
         this.userStore = userStore;
@@ -32,7 +29,7 @@ public class AuthenticationFilter extends Filter {
         if (requestURI.getPath().endsWith("/login")) {
             storeSession(exchange, requestURI);
             return;
-        } else if (!nonValidatingPaths.contains(getPathParameter(requestURI, 1))) {
+        } else if (!unRestrictedPaths.contains(getPathParameter(requestURI, 1))) {
             if (!validateSessionKey(exchange, requestURI)) {
                 return;
             }
@@ -49,9 +46,7 @@ public class AuthenticationFilter extends Filter {
     }
 
     private void storeSession(HttpExchange exchange, URI requestURI) {
-        String uuid = UUID.randomUUID().toString();
-        userStore.store(uuid, new UserSession(getFirstPathParameter(requestURI), LocalDateTime.now().plusMinutes(10L)));
-        sendResponse(exchange, uuid, 200);
+        sendResponse(exchange, userStore.create(getFirstPathParameter(requestURI)).id(), 200);
     }
 
 
