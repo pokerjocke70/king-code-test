@@ -21,7 +21,7 @@ public class TopListHandlerTest {
     }
 
     @Test
-    public void invoke() {
+    public void invokeShouldReturn200() {
         // given
         UserScoreService userScoreService = Mockito.mock(UserScoreService.class);
 

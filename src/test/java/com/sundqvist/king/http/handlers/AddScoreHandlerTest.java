@@ -21,7 +21,7 @@ public class AddScoreHandlerTest {
     }
 
     @Test
-    public void invoke() {
+    public void invokeShouldReturn204() {
         // given
         UserScoreService userScoreService = Mockito.mock(UserScoreService.class);
 
