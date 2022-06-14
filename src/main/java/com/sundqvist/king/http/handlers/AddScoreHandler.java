@@ -23,6 +23,6 @@ public class AddScoreHandler implements Handler {
     @Override
     public Response invoke(String body, String pathParam, String user) {
         userScoreService.addScoreToUser(user, Integer.parseInt(pathParam), Integer.parseInt(body));
-        return new Response(204, null);
+        return new Response(200, null);
     }
 }

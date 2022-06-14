@@ -21,7 +21,7 @@ public class AddScoreHandlerTest {
     }
 
     @Test
-    public void invokeShouldReturn204() {
+    public void invokeShouldReturn200() {
         // given
         UserScoreService userScoreService = Mockito.mock(UserScoreService.class);
 
@@ -29,7 +29,7 @@ public class AddScoreHandlerTest {
         Response response = new AddScoreHandler(userScoreService).invoke("99", "77", "user");
 
         // then
-        Assertions.assertThat(response).isEqualTo(new Response(204, null));
+        Assertions.assertThat(response).isEqualTo(new Response(200, null));
     }
 
 
